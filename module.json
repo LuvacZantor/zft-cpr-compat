@@ -1,0 +1,50 @@
+{
+  "id": "zft-cpr-compat",
+  "title": "ZFT CPR Compatibility Patches",
+  "description": "Local compatibility shims for CPR, Midi-QOL, DAE, and DnD5e homebrew automation.",
+  "version": "1.1.0",
+  "socket": true,
+  "authors": [
+    {
+      "name": "ZFT"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13.347"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "5.0",
+          "verified": "5.0"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "chris-premades",
+        "type": "module",
+        "manifest": "https://github.com/chrisk123999/chris-premades/releases/latest/download/module.json"
+      },
+      {
+        "id": "midi-qol",
+        "type": "module"
+      },
+      {
+        "id": "dae",
+        "type": "module"
+      },
+      {
+        "id": "socketlib",
+        "type": "module"
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/zft-cpr-compat.js"
+  ]
+}

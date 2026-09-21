@@ -1,0 +1,152 @@
+/*
+ * ZFT - Set Bear Totem Identifier
+ * Version: 1.0.3
+ *
+ * Purpose:
+ * This macro applies a CPR-style identifier flag to the actor's custom
+ * "Totem Spirit (2024): Bear" feature.
+ *
+ * Why this is needed:
+ * The ZFT CPR compatibility module checks actor items for a configured
+ * identifier before patching the Rage Active Effect with Bear resistances.
+ *
+ * This macro sets:
+ *
+ * flags.chris-premades.info.identifier = "zftSpiritTotemBear2024"
+ *
+ * Use:
+ * 1. Select the character token.
+ * 2. Run this macro once.
+ * 3. The selected actor's "Totem Spirit (2024): Bear" item will be updated.
+ *
+ * Notes:
+ * - If the selected token is linked, this updates the real actor.
+ * - If the selected token is unlinked, this updates only the synthetic token actor.
+ * - This does not apply resistances by itself.
+ * - This is a setup macro only.
+ */
+
+(async () => {
+  const VERSION = "1.0.3";
+
+  const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;
+  const itemName = "Totem Spirit (2024): Bear";
+  const identifier = "zftSpiritTotemBear2024";
+
+  console.log(`[ZFT] 🛠️ v${VERSION} | Bear feature identifier setup started`, {
+    actor: actor?.name,
+    itemName,
+    identifier
+  });
+
+  if (!actor) {
+    ui.notifications.error("No actor found. Select a token or assign a user character.");
+    console.error(`[ZFT] ❌ v${VERSION} | No actor found for Bear identifier setup`);
+    return;
+  }
+
+  const token = canvas.tokens.controlled[0];
+  if (token && !token.document.actorLink) {
+    console.warn(`[ZFT] ⚠️ v${VERSION} | Selected token is unlinked; update will affect synthetic token actor only`, {
+      token: token.name,
+      actor: actor.name
+    });
+  }
+
+  const item = actor.items.getName(itemName);
+
+  if (!item) {
+    ui.notifications.error(`Could not find item named "${itemName}" on ${actor.name}.`);
+    console.error(`[ZFT] ❌ v${VERSION} | Bear feature item not found`, {
+      actor: actor.name,
+      itemName,
+      availableItems: actor.items.map(i => i.name)
+    });
+    return;
+  }
+
+  await item.update({
+    "flags.chris-premades.info.identifier": identifier
+  });
+
+  console.log(`[ZFT] ✅ v${VERSION} | CPR-style identifier applied to Bear feature`, {
+    actor: actor.name,
+    item: item.name,
+    identifier: item.flags?.["chris-premades"]?.info?.identifier
+  });
+
+  ui.notifications.info(`Set ${item.name} identifier to ${identifier}.`);
+})();
+
+
+
+/*
+ * ZFT - Verify Bear Totem Identifier
+ * Version: 1.0.3
+ *
+ * Purpose:
+ * This macro checks whether the actor's custom
+ * "Totem Spirit (2024): Bear" feature has the expected CPR-style identifier.
+ *
+ * Expected identifier:
+ *
+ * zftSpiritTotemBear2024
+ *
+ * Use:
+ * 1. Select the character token.
+ * 2. Run this macro after running "ZFT - Set Bear Totem Identifier".
+ * 3. Check the console table and notification.
+ *
+ * Success means:
+ * The actor has an item named:
+ *
+ * Totem Spirit (2024): Bear
+ *
+ * and that item has:
+ *
+ * flags.chris-premades.info.identifier = "zftSpiritTotemBear2024"
+ *
+ * Notes:
+ * - This macro does not change anything.
+ * - It only reads actor item data and reports the result.
+ * - The ZFT CPR compatibility module uses this identifier to decide
+ *   whether Bear Rage resistances should be patched onto the Rage effect.
+ */
+
+(() => {
+  const VERSION = "1.0.3";
+
+  const actor = canvas.tokens.controlled[0]?.actor ?? game.user.character;
+
+  console.log(`[ZFT] 🧪 v${VERSION} | Verifying Bear feature CPR identifier`, {
+    actor: actor?.name
+  });
+
+  if (!actor) {
+    console.error(`[ZFT] ❌ v${VERSION} | No actor found for verification`);
+    ui.notifications.error("No actor found. Select a token or assign a user character.");
+    return;
+  }
+
+  const rows = actor.items
+    .map(i => ({
+      name: i.name,
+      identifier: i.flags?.["chris-premades"]?.info?.identifier
+    }))
+    .filter(i => /bear|totem|spirit|rage|wild/i.test(i.name) || i.identifier);
+
+  console.table(rows);
+
+  const match = rows.find(row => row.name === "Totem Spirit (2024): Bear");
+
+  if (match?.identifier === "zftSpiritTotemBear2024") {
+    console.log(`[ZFT] ✅ v${VERSION} | Bear feature identifier verified`, match);
+    ui.notifications.info("Bear feature identifier verified.");
+  } else {
+    console.warn(`[ZFT] ⚠️ v${VERSION} | Bear feature identifier missing or unexpected`, {
+      expected: "zftSpiritTotemBear2024",
+      found: match
+    });
+    ui.notifications.warn("Bear feature identifier missing or unexpected. Check console table.");
+  }
+})();
